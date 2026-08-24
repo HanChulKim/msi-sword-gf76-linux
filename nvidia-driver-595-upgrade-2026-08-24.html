@@ -1,0 +1,626 @@
+<title>NVIDIA 595 업그레이드 기록</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+
+<style>
+  :root {
+    --ground:        #ECEEEB;
+    --surface:       #F8F9F7;
+    --surface-sunk:  #E2E5E1;
+    --ink:           #1A1E1C;
+    --ink-soft:      #414945;
+    --ink-mute:      #6B736E;
+    --rule:          #CDD2CD;
+    --rule-soft:     #DDE1DC;
+    --accent:        #15616D;
+    --accent-soft:   #D9E7E9;
+    --fault:         #8E3B2F;
+    --fault-soft:    #F0DFDB;
+    --resolved:      #2D6A4F;
+    --resolved-soft: #DBE9E0;
+
+    --f-display: "Gowun Batang", "Nanum Myeongjo", Georgia, serif;
+    --f-body:    "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+    --f-mono:    "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+    --measure: 68ch;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:        #141715;
+      --surface:       #1C201E;
+      --surface-sunk:  #10130F;
+      --ink:           #E5E8E4;
+      --ink-soft:      #BFC5C0;
+      --ink-mute:      #8D958F;
+      --rule:          #333935;
+      --rule-soft:     #262B28;
+      --accent:        #5FB3C0;
+      --accent-soft:   #1B3A3F;
+      --fault:         #DE9082;
+      --fault-soft:    #3A241F;
+      --resolved:      #7FC7A5;
+      --resolved-soft: #1D3128;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground:        #141715;
+    --surface:       #1C201E;
+    --surface-sunk:  #10130F;
+    --ink:           #E5E8E4;
+    --ink-soft:      #BFC5C0;
+    --ink-mute:      #8D958F;
+    --rule:          #333935;
+    --rule-soft:     #262B28;
+    --accent:        #5FB3C0;
+    --accent-soft:   #1B3A3F;
+    --fault:         #DE9082;
+    --fault-soft:    #3A241F;
+    --resolved:      #7FC7A5;
+    --resolved-soft: #1D3128;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--f-body);
+    font-size: 16px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    margin: 0;
+    padding: 0 clamp(1.25rem, 5vw, 3rem) 6rem;
+  }
+
+  .page {
+    max-width: 74ch;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4rem;
+  }
+
+  a { color: var(--accent); text-underline-offset: 3px; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+
+  .masthead {
+    padding-top: 3.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .masthead::before {
+    content: "";
+    display: block;
+    height: 3px;
+    width: 4.5rem;
+    background: var(--accent);
+  }
+  .masthead h1 {
+    font-family: var(--f-display);
+    font-weight: 700;
+    font-size: clamp(2rem, 5.6vw, 3rem);
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0;
+  }
+  .standfirst {
+    font-size: 1.075rem;
+    color: var(--ink-soft);
+    max-width: var(--measure);
+    margin: 0;
+  }
+
+  .meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));
+    gap: 1.25rem 1.75rem;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    padding: 1.25rem 0;
+    margin: 0;
+  }
+  .meta div { display: flex; flex-direction: column; gap: 0.2rem; }
+  .meta dt,
+  .eyebrow {
+    font-family: var(--f-mono);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin: 0;
+  }
+  .meta dd {
+    font-family: var(--f-mono);
+    font-size: 0.875rem;
+    color: var(--ink);
+    margin: 0;
+    word-break: break-all;
+  }
+
+  .verdict {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--resolved);
+    padding: 1.5rem 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+  .verdict p { margin: 0; max-width: var(--measure); }
+  .verdict strong { font-weight: 600; }
+
+  .chip {
+    align-self: flex-start;
+    font-family: var(--f-mono);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.6rem;
+    border-radius: 2px;
+    background: var(--resolved-soft);
+    color: var(--resolved);
+  }
+
+  section { display: flex; flex-direction: column; gap: 1.5rem; }
+
+  .head { display: flex; flex-direction: column; gap: 0.45rem; }
+  .head h2 {
+    font-family: var(--f-body);
+    font-weight: 600;
+    font-size: 1.55rem;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  p { max-width: var(--measure); margin: 0; }
+
+  h3 {
+    font-family: var(--f-body);
+    font-weight: 600;
+    font-size: 1.05rem;
+    margin: 0;
+  }
+
+  ul.plain {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    max-width: var(--measure);
+  }
+  ul.plain > li { padding-left: 1.15rem; position: relative; }
+  ul.plain > li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.72em;
+    width: 5px;
+    height: 5px;
+    background: var(--accent);
+  }
+
+  code {
+    font-family: var(--f-mono);
+    font-size: 0.855em;
+    background: var(--surface-sunk);
+    padding: 0.1em 0.35em;
+    border-radius: 2px;
+    word-break: break-word;
+  }
+
+  .log {
+    font-family: var(--f-mono);
+    font-size: 0.8rem;
+    line-height: 1.65;
+    background: var(--surface-sunk);
+    color: var(--ink-soft);
+    padding: 0.65rem 0.9rem;
+    overflow-x: auto;
+    white-space: pre;
+    border-left: 2px solid var(--rule);
+  }
+  .log .ee { color: var(--fault); }
+  .log .ok { color: var(--resolved); }
+
+  .causes { display: flex; flex-direction: column; gap: 1rem; }
+  .cause {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--fault);
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+  .cause.benign { border-left-color: var(--accent); }
+  .cause.warn { border-left-color: var(--fault); }
+  .cause .path {
+    font-family: var(--f-mono);
+    font-size: 0.855rem;
+    font-weight: 600;
+    color: var(--ink);
+    word-break: break-all;
+  }
+  .cause p { font-size: 0.95rem; }
+
+  .scroll { overflow-x: auto; }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 36rem;
+    font-size: 0.9rem;
+    font-variant-numeric: tabular-nums;
+  }
+  th, td {
+    text-align: left;
+    padding: 0.7rem 1rem 0.7rem 0;
+    border-bottom: 1px solid var(--rule-soft);
+    vertical-align: top;
+  }
+  th {
+    font-family: var(--f-mono);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    border-bottom: 1px solid var(--rule);
+    white-space: nowrap;
+  }
+  tbody tr:last-child td { border-bottom: 1px solid var(--rule); }
+  td.was { color: var(--ink-mute); font-family: var(--f-mono); font-size: 0.8rem; }
+  td.now { color: var(--ink);      font-family: var(--f-mono); font-size: 0.8rem; }
+  td.now strong { color: var(--resolved); font-weight: 600; }
+  td.item { font-weight: 500; white-space: nowrap; }
+  td.pick { font-family: var(--f-mono); font-size: 0.8rem; }
+  tr.chosen td { background: var(--resolved-soft); }
+  tr.chosen td.item { color: var(--resolved); font-weight: 600; }
+
+  pre {
+    font-family: var(--f-mono);
+    font-size: 0.82rem;
+    line-height: 1.75;
+    background: var(--surface-sunk);
+    border: 1px solid var(--rule-soft);
+    color: var(--ink);
+    padding: 1rem 1.15rem;
+    overflow-x: auto;
+    margin: 0;
+  }
+  pre .c { color: var(--ink-mute); }
+
+  .note {
+    border-top: 1px solid var(--rule-soft);
+    padding-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .note p { font-size: 0.95rem; color: var(--ink-soft); }
+
+  footer {
+    border-top: 1px solid var(--rule);
+    padding-top: 1.5rem;
+    font-family: var(--f-mono);
+    font-size: 0.76rem;
+    color: var(--ink-mute);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+
+<div class="page">
+
+  <header class="masthead">
+    <h1>드라이버를 올린 김에<br>컨테이너 우회도 걷어냈다</h1>
+    <p class="standfirst">
+      <code>rainnam-msi</code>의 NVIDIA 드라이버를 565.57.01에서 595.84로 올린 기록.
+      목적은 버전 올리기 자체가 아니라, 20.04 시절 저장소에 묶여 있던 드라이버를
+      24.04 공식 저장소로 되돌리고 그 부작용으로 깨져 있던 GPU 컨테이너 경로를
+      정상화하는 것이었다.
+    </p>
+
+    <dl class="meta">
+      <div><dt>일자</dt><dd>2026-08-24</dd></div>
+      <div><dt>호스트</dt><dd>rainnam-msi.local</dd></div>
+      <div><dt>커널</dt><dd>6.8.0-138-generic</dd></div>
+      <div><dt>GPU</dt><dd>RTX 4060 Max-Q</dd></div>
+      <div><dt>이전</dt><dd>565.57.01</dd></div>
+      <div><dt>이후</dt><dd>595.84</dd></div>
+    </dl>
+  </header>
+
+  <div class="verdict">
+    <span class="chip">완료</span>
+    <p>
+      <strong>부수 효과가 본 목적만큼 중요했다.</strong>
+      드라이버 교체로 <code>nvidia-ctk</code>의 세그폴트가 사라져, Docker 29의 CDI 경로가
+      정상 동작하게 됐다. 이전 작업에서 임시로 걸어둔 <code>mode = "legacy"</code> 우회를
+      걷어내고 <code>auto</code>로 되돌렸다.
+    </p>
+  </div>
+
+  <section>
+    <div class="head">
+      <p class="eyebrow">배경</p>
+      <h2>왜 올렸나 — 세 가지가 겹쳐 있었다</h2>
+    </div>
+
+    <div class="causes">
+      <article class="cause">
+        <h3>출처가 20.04 저장소였다</h3>
+        <p>
+          565.57.01은 <code>developer.download.nvidia.com/.../ubuntu2004/</code>에서 설치된 것이라
+          <code>ubuntu-drivers</code>에 <code>third-party non-free</code>로 잡혔다. 그 저장소는
+          dist-upgrade 때 비활성화됐으므로, 드라이버는 업데이트를 받을 수 없는 고아 상태였다.
+        </p>
+      </article>
+
+      <article class="cause">
+        <h3>빌드가 오래됐다</h3>
+        <p>
+          565.57.01은 2024년 10월 빌드로, 실행 중인 커널(2026년 7월 빌드)과 1년 9개월 차이가 났다.
+          2026-08-21의 X 서버 장애 때 이미 DKMS 모듈이 로드되지 않는 문제가 있었고, 강제 재빌드로
+          넘겼지만 다음 커널 업데이트 때 재발할 여지가 남아 있었다.
+        </p>
+      </article>
+
+      <article class="cause">
+        <h3>GPU 컨테이너가 우회 모드였다</h3>
+        <div class="log">nvidia-container-runtime did not terminate successfully: <span class="ee">exit status 2</span></div>
+        <p>
+          Docker를 focal에서 noble로 올린 뒤 <code>--gpus all</code>이 실패했다. Docker 29는 GPU를
+          CDI로 해결하는데 <code>nvidia-ctk cdi generate</code>가 <code>nvSandboxUtilsShutdown</code>에서
+          세그폴트로 죽어 CDI 스펙을 만들 수 없었다. 툴킷 1.19.0과 드라이버 565의
+          <code>libnvidia-sandboxutils</code> 비호환이었다. 당시에는 <code>legacy</code> 모드로 고정해 넘겼다.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <section>
+    <div class="head">
+      <p class="eyebrow">선택</p>
+      <h2>후보 넷 중 배포판 권장 버전</h2>
+    </div>
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>패키지</th><th>후보 버전</th><th>비고</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="item">nvidia-driver-610-open</td><td class="pick">610.43.02-0ubuntu0.24.04.1</td><td>최신</td></tr>
+          <tr class="chosen"><td class="item">nvidia-driver-595-open</td><td class="pick">595.84-0ubuntu0.24.04.1</td><td>recommended — 선택</td></tr>
+          <tr><td class="item">nvidia-driver-580-open</td><td class="pick">580.173.02-0ubuntu0.24.04.1</td><td></td></tr>
+          <tr><td class="item">nvidia-driver-565</td><td class="pick">565.57.01-0ubuntu1</td><td>설치되어 있던 것 (third-party)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>
+      Ubuntu가 이 하드웨어에 recommended로 지정한 버전이고, 565에서 이미 충분히 큰 도약이며,
+      복구 직후의 CUDA 작업 머신이라 배포판 검증을 거친 쪽이 안전하다고 판단했다. 610도 설치는 가능하다.
+    </p>
+    <p>
+      <code>-open</code> 접미사는 오픈 커널 모듈을 뜻한다. RTX 4060(Ada)은 Turing 이후 세대라
+      오픈 모듈이 정식 지원되며, NVIDIA와 Ubuntu 모두 이쪽을 기본으로 권한다. 설치 후
+      <code>modinfo nvidia</code>의 <code>license: Dual MIT/GPL</code>로 확인된다.
+    </p>
+  </section>
+
+  <section>
+    <div class="head">
+      <p class="eyebrow">절차</p>
+      <h2>설치와 재부팅</h2>
+    </div>
+<pre><span class="c"># 사전 확인 — 후보 버전과 CUDA 스택 영향</span>
+ubuntu-drivers devices
+sudo apt-get install -s nvidia-driver-595-open   <span class="c"># 시뮬레이션</span>
+
+<span class="c"># 설치 (565 패키지 20개 제거 + 595 패키지 24개 설치)</span>
+sudo apt-get install -y nvidia-driver-595-open
+
+<span class="c"># 재부팅 — 커널 모듈 교체에 필수</span>
+sudo systemctl reboot</pre>
+    <p>
+      시뮬레이션에서 제거 대상은 <code>nvidia-*-565</code> / <code>libnvidia-*-565</code> 계열뿐이었다.
+      CUDA 툴킷, cuDNN, nvidia-container-toolkit, sdkmanager, vpi3는 모두 유지된다는 것을
+      설치 전에 확인했다.
+    </p>
+    <div class="note">
+      <p class="eyebrow">중간 상태</p>
+      <p>
+        재부팅 전 구간에서는 사용자 영역이 595인데 커널 모듈이 565라
+        <code>nvidia-smi</code>가 <code>Driver/library version mismatch</code>로 실패한다.
+        정상적인 중간 상태이며 재부팅으로 해소된다.
+      </p>
+    </div>
+
+    <h3>재부팅 후 — CDI 복원</h3>
+<pre><span class="c"># 세그폴트 없이 생성되는지 먼저 확인</span>
+sudo nvidia-ctk cdi generate --output=/tmp/cdi-test.yaml
+
+<span class="c"># 정식 경로에 생성</span>
+sudo mkdir -p /etc/cdi
+sudo nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml
+sudo nvidia-ctk cdi list
+
+<span class="c"># 툴킷을 legacy 우회에서 auto 로 되돌림</span>
+sudo sed -i 's|^mode = "legacy"|mode = "auto"|' /etc/nvidia-container-runtime/config.toml</pre>
+    <div class="log"><span class="ok">Generated CDI spec with version 0.5.0</span>
+Found 3 CDI devices</div>
+  </section>
+
+  <section>
+    <div class="head">
+      <p class="eyebrow">검증</p>
+      <h2>업그레이드 전후 상태</h2>
+    </div>
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>항목</th><th>이전</th><th>이후</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="item">드라이버</td><td class="was">565.57.01</td><td class="now"><strong>595.84</strong></td></tr>
+          <tr><td class="item">패키지 출처</td><td class="was">ubuntu2004 CUDA 저장소</td><td class="now">noble-updates / security</td></tr>
+          <tr><td class="item">커널 모듈</td><td class="was">proprietary</td><td class="now"><strong>오픈 (Dual MIT/GPL)</strong></td></tr>
+          <tr><td class="item">DKMS</td><td class="was">nvidia/565.57.01 installed</td><td class="now">nvidia/595.84 installed</td></tr>
+          <tr><td class="item">지원 CUDA</td><td class="was">12.7</td><td class="now">13.2</td></tr>
+          <tr><td class="item">nvidia-ctk cdi generate</td><td class="was">세그폴트</td><td class="now"><strong>정상 (spec v0.5.0)</strong></td></tr>
+          <tr><td class="item">툴킷 모드</td><td class="was">legacy (우회)</td><td class="now"><strong>auto</strong></td></tr>
+          <tr><td class="item">CDI 장치</td><td class="was">0개</td><td class="now"><strong>3개</strong></td></tr>
+          <tr><td class="item">Intel iGPU</td><td class="was">i915</td><td class="now">i915 (변화 없음)</td></tr>
+          <tr><td class="item">Xorg 가속</td><td class="was">glamor on Mesa Intel</td><td class="now">동일</td></tr>
+          <tr><td class="item">디스플레이</td><td class="was">eDP-1 1920x1080</td><td class="now">동일</td></tr>
+          <tr><td class="item">PRIME 오프로드</td><td class="was">RTX 4060</td><td class="now">RTX 4060</td></tr>
+          <tr><td class="item">CUDA 툴킷</td><td class="was">12.6 (V12.6.85)</td><td class="now">12.6 (변화 없음)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>GPU 컨테이너는 두 경로 모두 확인했다.</p>
+<pre>docker run --rm --gpus all ubuntu:20.04 nvidia-smi -L
+docker run --rm --device nvidia.com/gpu=all ubuntu:20.04 nvidia-smi -L</pre>
+    <p>
+      둘 다 <code>GPU 0: NVIDIA GeForce RTX 4060 Laptop GPU</code>를 반환했다.
+      앞은 기존 문법이 CDI로 해결되는 경로, 뒤는 CDI를 직접 지정하는 경로다.
+    </p>
+  </section>
+
+  <section>
+    <div class="head">
+      <p class="eyebrow">남은 사항</p>
+      <h2>알아둘 것 셋</h2>
+    </div>
+
+    <div class="causes">
+      <article class="cause warn">
+        <h3>apt autoremove를 그대로 실행하지 말 것</h3>
+        <p>
+          이 머신에서 autoremove 대상에 TensorRT 패키지(<code>libnvinfer*</code>
+          10.13.0.35+cuda12.9)가 포함된다. 시뮬레이션(<code>apt-get -s autoremove</code>)으로
+          목록을 먼저 확인하고, 필요한 것은 <code>apt-mark manual</code>로 보호한 뒤 실행해야 한다.
+        </p>
+      </article>
+
+      <article class="cause benign">
+        <h3>드라이버는 CUDA 13.2, 툴킷은 12.6</h3>
+        <p>
+          불일치가 아니라 정상이다. 드라이버는 자신이 지원하는 최대 CUDA 버전을 보고하며,
+          하위 호환이므로 12.6 툴킷으로 빌드한 코드는 그대로 동작한다. 툴킷을 올릴 필요는 없다.
+        </p>
+      </article>
+
+      <article class="cause benign">
+        <h3>잔여 패키지와 610 선택지</h3>
+        <p>
+          <code>nvidia-firmware-565-565.57.01</code>이 제거되지 않고 남아 있다. 동작에 영향은 없다.
+          610은 여전히 선택지로, 필요해지면
+          <code>sudo apt install nvidia-driver-610-open</code>으로 올릴 수 있다.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <section>
+    <div class="head">
+      <p class="eyebrow">후속 조치 (16:00)</p>
+      <h2>CUDA 저장소를 24.04 판으로 복원</h2>
+    </div>
+    <p>
+      드라이버 업그레이드 뒤 TensorRT 패키지가 <code>dpkg/status</code> 외에 어떤 저장소도
+      출처로 갖지 못하는 고아 상태였다. 재설치도 업그레이드도 불가능한 상태였고, 근본 원인은
+      <code>cuda-keyring</code> 패키지가 20.04 시절에 설치된 것이었기 때문이다.
+    </p>
+
+    <div class="causes">
+      <article class="cause benign">
+        <h3>핵심 오해 정리 — cuda-keyring 은 키만 까는 패키지가 아니다</h3>
+        <p><code>dpkg -L cuda-keyring</code>이 보여주는 실제 설치 파일:</p>
+        <div class="log">/usr/share/keyrings/cuda-archive-keyring.gpg        <span class="ee">← GPG 서명 키</span>
+/etc/apt/preferences.d/cuda-repository-pin-600      <span class="ee">← apt pin</span>
+/etc/apt/sources.list.d/cuda-ubuntu2004-x86_64.list <span class="ee">← 저장소 URL (배포판 이름 박힘)</span></div>
+        <p>
+          세 번째 파일이 문제였다. <strong>NVIDIA는 배포판마다 별도의 <code>.deb</code>를 배포하며</strong>,
+          파일 이름은 모두 <code>cuda-keyring_1.1-1_all.deb</code>로 같지만 안의 <code>.list</code> URL이 다르다.
+          그래서 "apt로 업그레이드"할 대상이 아니라 <strong>"24.04용 <code>.deb</code>로 교체"</strong>해야 한다.
+        </p>
+      </article>
+    </div>
+
+<pre><span class="c"># 1. 기존 20.04 keyring 제거 (연관 백업 파일도 정리)</span>
+sudo apt purge cuda-keyring
+sudo rm -f /etc/apt/sources.list.d/cuda-ubuntu2004-x86_64.list.distUpgrade
+sudo rm -f /etc/apt/sources.list.d/cuda-ubuntu2004-x86_64.list.save
+
+<span class="c"># 2. 24.04 keyring 다운로드 및 설치</span>
+curl -fsSLo /tmp/cuda-keyring.deb \
+  https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-keyring_1.1-1_all.deb
+sudo dpkg -i /tmp/cuda-keyring.deb
+rm /tmp/cuda-keyring.deb
+
+<span class="c"># 3. apt 새로고침</span>
+sudo apt update</pre>
+
+    <p>
+      새 파일이 <code>/etc/apt/sources.list.d/cuda-ubuntu2404-x86_64.list</code>에 생성되고,
+      apt가 <code>developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/</code>에서
+      InRelease를 받아온다.
+    </p>
+
+    <h3>검증 — 저장소가 붙자 TensorRT/CUDA 패키지가 다시 잡힘</h3>
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>패키지</th><th>이전</th><th>이후</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="item">cuda-keyring</td><td class="was">ubuntu2004 판 (dpkg/status만)</td><td class="now"><strong>ubuntu2404 판 (noble 저장소 연결)</strong></td></tr>
+          <tr><td class="item">CUDA 저장소</td><td class="was">비활성 (.distUpgrade 잔재)</td><td class="now"><strong>활성</strong> (2404/x86_64)</td></tr>
+          <tr><td class="item">libnvinfer10</td><td class="was">10.13.0.35 (dpkg/status만)</td><td class="now"><strong>10.16.1.11-1+cuda13.2</strong> (신규 후보 등장)</td></tr>
+          <tr><td class="item">tensorrt (메타)</td><td class="was">저장소 없음</td><td class="now"><strong>11.2.1.2-1+cuda13.3</strong></td></tr>
+          <tr><td class="item">cuda-toolkit-12-6</td><td class="was">12.6.3-1 (installed)</td><td class="now">동일 (유지)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note">
+      <p class="eyebrow">주의</p>
+      <p>
+        저장소만 활성화했을 뿐 이번 작업에서 TensorRT를 <strong>업그레이드하지는 않았다.</strong>
+        필요 시 <code>sudo apt install --only-upgrade libnvinfer10 libnvinfer-dev ...</code>로 갱신할 수 있고,
+        <code>tensorrt-dev</code> 메타패키지를 새로 설치하면 이후 자동 관리도 붙는다.
+        다만 이 시점부터 커널·드라이버 업데이트 때 CUDA 저장소도 함께 후보에 오르므로,
+        다음 <code>apt upgrade</code> 전에는 목록을 한 번 훑어보는 편이 좋다.
+      </p>
+      <p>
+        <code>libnvinfer10</code>이 이제 저장소 출처를 갖는다는 것은,
+        위의 autoremove 경고가 여전히 유효하되 이유가 하나 바뀌었다는 뜻이다 —
+        지금 지워도 원한다면 apt로 되깔 수 있게 됐다.
+      </p>
+    </div>
+  </section>
+
+  <footer>
+    <span>rainnam-msi.local</span>
+    <span>업그레이드 2026-08-24 KST</span>
+    <span>후속 조치 16:00 KST</span>
+    <span>565.57.01 → 595.84 · cuda-keyring 2004 → 2404</span>
+    <span>상태: 완료</span>
+  </footer>
+
+</div>
