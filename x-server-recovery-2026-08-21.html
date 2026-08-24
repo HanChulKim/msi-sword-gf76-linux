@@ -1,0 +1,744 @@
+<title>rainnam-msi X 복구 기록</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+
+<style>
+  :root {
+    --ground:        #ECEEEB;
+    --surface:       #F8F9F7;
+    --surface-sunk:  #E2E5E1;
+    --ink:           #1A1E1C;
+    --ink-soft:      #414945;
+    --ink-mute:      #6B736E;
+    --rule:          #CDD2CD;
+    --rule-soft:     #DDE1DC;
+    --accent:        #15616D;
+    --accent-soft:   #D9E7E9;
+    --fault:         #8E3B2F;
+    --fault-soft:    #F0DFDB;
+    --resolved:      #2D6A4F;
+    --resolved-soft: #DBE9E0;
+
+    --f-display: "Gowun Batang", "Nanum Myeongjo", Georgia, serif;
+    --f-body:    "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+    --f-mono:    "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+    --measure: 68ch;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:        #141715;
+      --surface:       #1C201E;
+      --surface-sunk:  #10130F;
+      --ink:           #E5E8E4;
+      --ink-soft:      #BFC5C0;
+      --ink-mute:      #8D958F;
+      --rule:          #333935;
+      --rule-soft:     #262B28;
+      --accent:        #5FB3C0;
+      --accent-soft:   #1B3A3F;
+      --fault:         #DE9082;
+      --fault-soft:    #3A241F;
+      --resolved:      #7FC7A5;
+      --resolved-soft: #1D3128;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground:        #141715;
+    --surface:       #1C201E;
+    --surface-sunk:  #10130F;
+    --ink:           #E5E8E4;
+    --ink-soft:      #BFC5C0;
+    --ink-mute:      #8D958F;
+    --rule:          #333935;
+    --rule-soft:     #262B28;
+    --accent:        #5FB3C0;
+    --accent-soft:   #1B3A3F;
+    --fault:         #DE9082;
+    --fault-soft:    #3A241F;
+    --resolved:      #7FC7A5;
+    --resolved-soft: #1D3128;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--f-body);
+    font-size: 16px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    margin: 0;
+    padding: 0 clamp(1.25rem, 5vw, 3rem) 6rem;
+  }
+
+  .page {
+    max-width: 74ch;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4rem;
+  }
+
+  a { color: var(--accent); text-underline-offset: 3px; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+
+  /* ---------- masthead ---------- */
+
+  .masthead {
+    padding-top: 3.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .masthead::before {
+    content: "";
+    display: block;
+    height: 3px;
+    width: 4.5rem;
+    background: var(--accent);
+  }
+  .masthead h1 {
+    font-family: var(--f-display);
+    font-weight: 700;
+    font-size: clamp(2rem, 5.6vw, 3rem);
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0;
+  }
+  .standfirst {
+    font-size: 1.075rem;
+    color: var(--ink-soft);
+    max-width: var(--measure);
+    margin: 0;
+  }
+
+  .meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));
+    gap: 1.25rem 1.75rem;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    padding: 1.25rem 0;
+    margin: 0;
+  }
+  .meta div { display: flex; flex-direction: column; gap: 0.2rem; }
+  .meta dt,
+  .eyebrow {
+    font-family: var(--f-mono);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin: 0;
+  }
+  .meta dd {
+    font-family: var(--f-mono);
+    font-size: 0.875rem;
+    color: var(--ink);
+    margin: 0;
+    word-break: break-all;
+  }
+
+  /* ---------- verdict ---------- */
+
+  .verdict {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--resolved);
+    padding: 1.5rem 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+  .verdict p { margin: 0; max-width: var(--measure); }
+  .verdict strong { font-weight: 600; }
+
+  .chip {
+    align-self: flex-start;
+    font-family: var(--f-mono);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.6rem;
+    border-radius: 2px;
+    background: var(--resolved-soft);
+    color: var(--resolved);
+  }
+
+  /* ---------- sections ---------- */
+
+  section { display: flex; flex-direction: column; gap: 1.5rem; }
+
+  .head { display: flex; flex-direction: column; gap: 0.45rem; }
+  .head h2 {
+    font-family: var(--f-body);
+    font-weight: 600;
+    font-size: 1.55rem;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  p { max-width: var(--measure); margin: 0; }
+
+  ul.plain {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    max-width: var(--measure);
+  }
+  ul.plain > li { padding-left: 1.15rem; position: relative; }
+  ul.plain > li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.72em;
+    width: 5px;
+    height: 5px;
+    background: var(--accent);
+  }
+
+  code {
+    font-family: var(--f-mono);
+    font-size: 0.855em;
+    background: var(--surface-sunk);
+    padding: 0.1em 0.35em;
+    border-radius: 2px;
+    word-break: break-word;
+  }
+
+  /* ---------- fallback chain ---------- */
+
+  .chain {
+    list-style: none;
+    counter-reset: step;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .chain > li {
+    counter-increment: step;
+    position: relative;
+    padding: 0 0 1.5rem 3.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+  .chain > li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1.9rem;
+    height: 1.9rem;
+    display: grid;
+    place-items: center;
+    font-family: var(--f-mono);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--accent);
+    background: var(--ground);
+    border: 1px solid var(--rule);
+    border-radius: 50%;
+  }
+  .chain > li::after {
+    content: "";
+    position: absolute;
+    left: calc(0.95rem - 0.5px);
+    top: 1.9rem;
+    bottom: 0;
+    width: 1px;
+    background: var(--rule);
+  }
+  .chain > li:last-child { padding-bottom: 0; }
+  .chain > li:last-child::after { display: none; }
+  .chain .what { font-weight: 500; }
+  .chain .why { color: var(--ink-soft); font-size: 0.94rem; }
+
+  .log {
+    font-family: var(--f-mono);
+    font-size: 0.8rem;
+    line-height: 1.65;
+    background: var(--surface-sunk);
+    color: var(--ink-soft);
+    padding: 0.65rem 0.9rem;
+    overflow-x: auto;
+    white-space: pre;
+    border-left: 2px solid var(--rule);
+  }
+  .log .ee { color: var(--fault); }
+
+  /* ---------- cause cards ---------- */
+
+  .causes { display: flex; flex-direction: column; gap: 1rem; }
+  .cause {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--fault);
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+  .cause.benign { border-left-color: var(--accent); }
+  .cause .path {
+    font-family: var(--f-mono);
+    font-size: 0.855rem;
+    font-weight: 600;
+    color: var(--ink);
+    word-break: break-all;
+  }
+  .cause p { font-size: 0.95rem; }
+  .cause dl {
+    margin: 0;
+    display: grid;
+    grid-template-columns: 5rem 1fr;
+    gap: 0.4rem 1rem;
+    font-size: 0.9rem;
+    border-top: 1px solid var(--rule-soft);
+    padding-top: 0.8rem;
+  }
+  .cause dt {
+    font-family: var(--f-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    padding-top: 0.28em;
+  }
+  .cause dd { margin: 0; color: var(--ink-soft); }
+
+  /* ---------- tables ---------- */
+
+  .scroll { overflow-x: auto; }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 36rem;
+    font-size: 0.9rem;
+    font-variant-numeric: tabular-nums;
+  }
+  th, td {
+    text-align: left;
+    padding: 0.7rem 1rem 0.7rem 0;
+    border-bottom: 1px solid var(--rule-soft);
+    vertical-align: top;
+  }
+  th {
+    font-family: var(--f-mono);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    border-bottom: 1px solid var(--rule);
+    white-space: nowrap;
+  }
+  tbody tr:last-child td { border-bottom: 1px solid var(--rule); }
+  td.was { color: var(--ink-mute); font-family: var(--f-mono); font-size: 0.8rem; }
+  td.now { color: var(--ink);      font-family: var(--f-mono); font-size: 0.8rem; }
+  td.item { font-weight: 500; white-space: nowrap; }
+
+  /* ---------- command blocks ---------- */
+
+  pre {
+    font-family: var(--f-mono);
+    font-size: 0.82rem;
+    line-height: 1.75;
+    background: var(--surface-sunk);
+    border: 1px solid var(--rule-soft);
+    color: var(--ink);
+    padding: 1rem 1.15rem;
+    overflow-x: auto;
+    margin: 0;
+  }
+  pre .c { color: var(--ink-mute); }
+
+  /* ---------- checklist ---------- */
+
+  .checklist {
+    list-style: none;
+    counter-reset: chk;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    max-width: var(--measure);
+  }
+  .checklist > li {
+    counter-increment: chk;
+    display: grid;
+    grid-template-columns: 1.7rem 1fr;
+    gap: 0.9rem;
+    align-items: baseline;
+  }
+  .checklist > li::before {
+    content: counter(chk, decimal-leading-zero);
+    font-family: var(--f-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--accent);
+  }
+  .checklist .cmd {
+    font-family: var(--f-mono);
+    font-size: 0.855rem;
+    font-weight: 500;
+    color: var(--ink);
+    word-break: break-word;
+  }
+  .checklist .hint { display: block; color: var(--ink-soft); font-size: 0.9rem; }
+
+  /* ---------- notes ---------- */
+
+  .note {
+    border-top: 1px solid var(--rule-soft);
+    padding-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .note p { font-size: 0.95rem; color: var(--ink-soft); }
+
+  footer {
+    border-top: 1px solid var(--rule);
+    padding-top: 1.5rem;
+    font-family: var(--f-mono);
+    font-size: 0.76rem;
+    color: var(--ink-mute);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+
+  @media (max-width: 34rem) {
+    .cause dl { grid-template-columns: 1fr; gap: 0.15rem; }
+    .cause dt { padding-top: 0.5rem; }
+  }
+</style>
+
+<div class="page">
+
+  <header class="masthead">
+    <h1>로그인 화면이 멈춘 이유는<br>마우스가 아니라 GPU였다</h1>
+    <p class="standfirst">
+      MSI 노트북 <code>rainnam-msi</code>의 GNOME 로그인 화면 장애 진단 및 복구 기록.
+      증상은 입력 장치 문제처럼 보였지만, 실제로는 GPU 드라이버가 하나도 바인딩되지 않아
+      X가 소프트웨어 렌더링으로 떨어진 것이 원인이었다.
+    </p>
+
+    <dl class="meta">
+      <div><dt>일자</dt><dd>2026-08-21</dd></div>
+      <div><dt>호스트</dt><dd>rainnam-msi.local</dd></div>
+      <div><dt>OS</dt><dd>Ubuntu 24.04.4 LTS</dd></div>
+      <div><dt>커널</dt><dd>6.8.0-138-generic</dd></div>
+      <div><dt>iGPU</dt><dd>Intel Raptor Lake-P</dd></div>
+      <div><dt>dGPU</dt><dd>RTX 4060 Max-Q</dd></div>
+    </dl>
+  </header>
+
+  <div class="verdict">
+    <span class="chip">해결됨</span>
+    <p>
+      <strong>근본 원인은 <code>/etc/default/grub</code>의 <code>i915.modeset=0</code>이었다.</strong>
+      여기에 낡은 <code>xorg.conf</code>와 로드에 실패하는 <code>nvidia.ko</code>가 겹쳐 있었다.
+      셋을 모두 정리하고 재부팅한 뒤 콘솔 로그인에 성공했으며, Intel iGPU 하드웨어 가속과
+      NVIDIA PRIME 오프로드가 모두 정상 동작하는 것을 확인했다.
+    </p>
+  </div>
+
+  <section>
+    <div class="head">
+      <p class="eyebrow">증상</p>
+      <h2>보고된 현상과, 그것이 가리키지 않았던 것</h2>
+    </div>
+    <ul class="plain">
+      <li>콘솔과 SSH는 정상. 시스템 자체는 살아 있었다.</li>
+      <li>GNOME 로그인 화면에서 <strong>마우스 커서가 보이지 않음</strong>.</li>
+      <li>키보드로 로그인을 시도했으나 반응이 없어 <strong>실패한 것처럼 보임</strong>.</li>
+      <li><code>gdm.service</code>는 <code>active (running)</code>, <code>graphical.target</code>도 <code>active</code>. 서비스 계층에는 이상이 없었다.</li>
+    </ul>
+    <p>
+      입력 장치는 처음부터 정상이었다. Xorg 로그를 보면 libinput이 AT 키보드, 터치패드 2종,
+      Logitech USB 마우스를 모두 잡고 있었다. 커서가 없었던 것은 입력을 못 받아서가 아니라
+      <strong>커서를 그릴 하드웨어가 없었기 때문</strong>이고, 키 입력이 안 먹힌 것처럼 보인 것은
+      화면 갱신이 사실상 멈춰 있었기 때문이다.
+    </p>
+  </section>
+
+  <section>
+    <div class="head">
+      <p class="eyebrow">진단</p>
+      <h2>X가 하드웨어에서 소프트웨어로 떨어진 경로</h2>
+    </div>
+    <p>
+      아래는 <code>/var/lib/gdm3/.local/share/xorg/Xorg.0.log</code>에 남은 실제 폴백 순서다.
+      각 단계가 다음 단계를 강제하므로 순서 자체가 정보다.
+    </p>
+
+    <ol class="chain">
+      <li>
+        <span class="what">Intel 드라이버가 i915를 기다리다 포기</span>
+        <div class="log">intel: waited 2020 ms for i915.ko driver to load</div>
+        <span class="why"><code>i915.modeset=0</code> 때문에 모듈은 메모리에 있으나 어떤 장치에도 바인딩되지 않는다.</span>
+      </li>
+      <li>
+        <span class="what">NVIDIA DRM 장치 열기 실패</span>
+        <div class="log"><span class="ee">(EE)</span> [drm] Failed to open DRM device for pci:0000:01:00.0: -19</div>
+        <span class="why"><code>-19</code>은 ENODEV. nvidia 커널 모듈이 아예 로드되지 않은 상태였다.</span>
+      </li>
+      <li>
+        <span class="what">쓸 수 있는 GPU가 없다고 판정</span>
+        <div class="log"><span class="ee">(EE)</span> No devices detected.</div>
+        <span class="why">여기서 <code>xorg.conf</code>에 적힌 장치 설정이 전부 무효가 되고 자동 설정으로 넘어간다.</span>
+      </li>
+      <li>
+        <span class="what">EFI 프레임버퍼로 폴백</span>
+        <div class="log">(==) Matched modesetting as autoconfigured driver 0</div>
+        <span class="why"><code>/dev/dri/card0</code>의 <code>DRIVER</code>는 <code>simple-framebuffer</code>. 진짜 GPU가 아니라 펌웨어가 남긴 프레임버퍼다.</span>
+      </li>
+      <li>
+        <span class="what">소프트웨어 래스터라이저로 렌더링</span>
+        <div class="log">glamor X acceleration enabled on llvmpipe (LLVM 20.1.2, 256 bits)</div>
+        <span class="why">llvmpipe에는 하드웨어 커서 평면이 없다. <strong>여기서 마우스가 사라진다.</strong></span>
+      </li>
+    </ol>
+
+    <div class="note">
+      <p class="eyebrow">교차 확인</p>
+      <p>
+        <code>gnome-shell</code>도 같은 이야기를 하고 있었다 —
+        <code>failed to load driver: simpledrm</code>,
+        <code>glx: failed to create dri3 screen</code>.
+        그리고 <code>lspci -k</code> 출력의 두 GPU 어디에도
+        <code>Kernel driver in use</code> 줄이 없었다. 이것이 결정적 증거였다.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <div class="head">
+      <p class="eyebrow">원인</p>
+      <h2>겹겹이 쌓인 수동 우회 설정 세 건</h2>
+    </div>
+    <p>
+      셋은 서로 다른 시점에 각각 추가된 별개의 문제이며 순서가 없다.
+      다만 화면을 죽인 직접적 원인은 첫 번째 하나다.
+    </p>
+
+    <div class="causes">
+      <article class="cause">
+        <span class="path">/etc/default/grub</span>
+        <div class="log">GRUB_CMDLINE_LINUX_DEFAULT="quiet splash i915.modeset=0 nvidia-drm.modeset=0"</div>
+        <p>
+          <strong>이 한 줄이 직접적인 원인이다.</strong> <code>i915.modeset=0</code>은 내장 그래픽의
+          커널 모드 설정을 끈다. 디스플레이를 담당하는 것은 Intel iGPU이므로, 이 순간 노트북 패널을
+          구동할 드라이버가 사라진다.
+        </p>
+        <p>
+          다만 이것은 <strong>Ubuntu 20.04 시절에 넣은 설정</strong>이며, 당시 환경에서는 성립했다.
+          NVIDIA가 화면을 담당하는 구성이었다면 iGPU를 꺼두는 것이 의도된 선택일 수 있다.
+          문제는 이 설정이 dist-upgrade를 타고 24.04 / 커널 6.8까지 그대로 따라온 것이다.
+          <code>dpkg -l</code>에 <code>5.15.0-*~20.04.1</code> 커널 잔재가 남아 있는 것이
+          그 업그레이드 이력을 보여준다.
+        </p>
+        <dl>
+          <dt>유래</dt><dd>Ubuntu 20.04 환경에 맞춘 설정. dist-upgrade로 잔존</dd>
+          <dt>조치</dt><dd>두 파라미터 제거 후 <code>update-grub</code></dd>
+          <dt>백업</dt><dd><code>/etc/default/grub.bak.20260821-173456</code></dd>
+        </dl>
+      </article>
+
+      <article class="cause">
+        <span class="path">/etc/X11/xorg.conf</span>
+        <p>
+          <code>Xorg -configure</code>로 생성된 낡은 파일이 남아 실제로 로드되고 있었다
+          (<code>(==) Using config file: "/etc/X11/xorg.conf"</code>). 내용은 현재 하드웨어와 맞지 않았다.
+        </p>
+        <ul class="plain">
+          <li><code>Card0</code> → <code>Driver "intel"</code>. xf86-video-intel은 Raptor Lake를 지원하지 않는다.</li>
+          <li><code>Card1</code> → <code>Driver "nouveau"</code>. 그런데 nouveau는 <code>/etc/modprobe.d/</code>에서 블랙리스트되어 있다.</li>
+          <li><code>InputDevice</code>가 레거시 <code>kbd</code> / <code>mouse</code> 드라이버 지정. 해당 <code>.so</code> 파일은 시스템에 존재하지도 않는다.</li>
+        </ul>
+        <p>
+          i915만 되살렸다면 이 설정이 다시 X를 깨뜨렸을 것이다. 이번 부팅에서는 GPU가 아예 없어
+          자동 설정으로 넘어가는 바람에 가려져 있었다.
+        </p>
+        <dl>
+          <dt>조치</dt><dd>비활성화, 자동 설정에 위임</dd>
+          <dt>백업</dt><dd><code>/etc/X11/xorg.conf.disabled-20260821-173830</code></dd>
+        </dl>
+      </article>
+
+      <article class="cause">
+        <span class="path">/lib/modules/6.8.0-138-generic/updates/dkms/nvidia.ko</span>
+        <div class="log">nvidia: disagrees about version of symbol sme_me_mask
+nvidia: <span class="ee">Unknown symbol sme_me_mask (err -22)</span></div>
+        <p>
+          까다로운 지점은 <strong>모든 정황 증거가 정상이라고 말했다</strong>는 것이다.
+          <code>dkms status</code>는 해당 커널에 <code>installed</code>로 보고했고,
+          <code>vermagic</code>도 일치했으며, 모듈 파일의 심볼 CRC <code>0x8a35b432</code>는
+          헤더의 <code>Module.symvers</code> 값과 정확히 같았다.
+          <code>dpkg -V</code>로 커널·헤더·드라이버 패키지를 검증해도 변조가 없었다.
+          그럼에도 실행 중인 커널은 로드를 거부했다.
+        </p>
+        <p>
+          설치된 파일이 비압축 <code>.ko</code>인 반면 정상 빌드 산출물은 <code>.ko.zst</code>라는
+          점이 단서였다. 이전 설치 과정에서 남은 낡은 사본이 자리를 차지하고 있었던 것으로 보인다.
+          강제 재빌드로 해결됐다.
+        </p>
+        <dl>
+          <dt>조치</dt><dd><code>dkms build/install --force</code> 후 <code>update-initramfs -u</code></dd>
+          <dt>결과</dt><dd><code>nvidia-smi</code> 정상, RTX 4060 인식</dd>
+        </dl>
+      </article>
+    </div>
+
+    <div class="note">
+      <p class="eyebrow">왜 이렇게 됐나</p>
+      <p>
+        셋 다 <strong>과거 환경에 맞춰 넣은 설정이 그대로 남은 것</strong>이다.
+        <code>i915.modeset=0</code>은 20.04 시절 설정이고, <code>xorg.conf</code>도 2025년 1월
+        파일이다. 하드웨어와 커널은 계속 바뀌었는데 설정만 따라오지 못했다.
+      </p>
+      <p>
+        NVIDIA가 화면을 담당하는 동안에는 iGPU가 꺼져 있어도 티가 나지 않는다.
+        그러다 nvidia 모듈이 로드에 실패하는 순간, 넘어갈 곳이 없어진다 —
+        폴백이 되어야 할 Intel이 이미 꺼져 있기 때문이다.
+        <strong>고장 하나가 아니라, 안전망을 미리 걷어둔 상태에서 고장이 난 것</strong>이
+        이번 장애의 구조다.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <div class="head">
+      <p class="eyebrow">조치</p>
+      <h2>적용한 변경과 실행 순서</h2>
+    </div>
+    <p>
+      <code>update-initramfs</code>는 빠뜨리기 쉬운 단계였다. 모듈 재빌드 직후에도 initramfs 안에는
+      로드에 실패하던 예전 <code>nvidia.ko</code>가 그대로 들어 있었다.
+    </p>
+<pre><span class="c"># 1. GRUB — 백업 후 modeset 파라미터 제거</span>
+sudo cp -a /etc/default/grub /etc/default/grub.bak.$(date +%Y%m%d-%H%M%S)
+sudo sed -i 's|^GRUB_CMDLINE_LINUX_DEFAULT=.*|GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"|' /etc/default/grub
+sudo update-grub
+
+<span class="c"># 2. NVIDIA — 강제 재빌드</span>
+sudo dkms build   nvidia/565.57.01 -k 6.8.0-138-generic --force
+sudo dkms install nvidia/565.57.01 -k 6.8.0-138-generic --force
+
+<span class="c"># 3. xorg.conf — 비활성화하고 자동 설정에 위임</span>
+sudo mv /etc/X11/xorg.conf /etc/X11/xorg.conf.disabled-$(date +%Y%m%d-%H%M%S)
+
+<span class="c"># 4. initramfs — 낡은 nvidia.ko가 남아 있으므로 재생성</span>
+sudo update-initramfs -u -k 6.8.0-138-generic
+
+<span class="c"># 5. 재부팅</span>
+sudo systemctl reboot</pre>
+  </section>
+
+  <section>
+    <div class="head">
+      <p class="eyebrow">검증</p>
+      <h2>재부팅 전후 상태</h2>
+    </div>
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>항목</th><th>이전</th><th>현재</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="item">커널 파라미터</td><td class="was">i915.modeset=0 nvidia-drm.modeset=0</td><td class="now">quiet splash</td></tr>
+          <tr><td class="item">Intel iGPU</td><td class="was">바인딩 없음</td><td class="now">driver in use: i915</td></tr>
+          <tr><td class="item">NVIDIA dGPU</td><td class="was">모듈 로드 실패</td><td class="now">driver in use: nvidia</td></tr>
+          <tr><td class="item">/dev/dri</td><td class="was">card0 = simple-framebuffer</td><td class="now">card1 · card2 · renderD128 · renderD129</td></tr>
+          <tr><td class="item">Xorg 가속</td><td class="was">glamor on llvmpipe</td><td class="now">glamor on Mesa Intel (RPL-P)</td></tr>
+          <tr><td class="item">디스플레이</td><td class="was">출력 없음</td><td class="now">eDP-1 connected, 1920x1080</td></tr>
+          <tr><td class="item">OpenGL</td><td class="was">—</td><td class="now">Mesa Intel(R) Graphics (RPL-P)</td></tr>
+          <tr><td class="item">PRIME 오프로드</td><td class="was">—</td><td class="now">GeForce RTX 4060 Laptop GPU</td></tr>
+          <tr><td class="item">포인터</td><td class="was">커서 없음</td><td class="now">마우스 · 터치패드 2종 연결</td></tr>
+          <tr><td class="item">콘솔 로그인</td><td class="was">실패</td><td class="now">성공 (seat0 / tty2 / x11)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>
+      PRIME 프로파일은 <code>on-demand</code>를 유지했다. 데스크톱은 Intel iGPU가 그리고,
+      NVIDIA는 오프로드와 CUDA 작업에만 쓰인다.
+    </p>
+  </section>
+
+  <section>
+    <div class="head">
+      <p class="eyebrow">무시해도 되는 로그</p>
+      <h2>정상 동작 중에도 계속 나오는 메시지</h2>
+    </div>
+    <div class="causes">
+      <article class="cause benign">
+        <div class="log">[drm:nv_drm_master_set [nvidia_drm]] <span class="ee">*ERROR*</span> Failed to grab modeset ownership</div>
+        <p>
+          on-demand PRIME에서는 정상이다. Xorg가 <code>10-nvidia.conf</code>의 OutputClass 때문에
+          nvidia를 먼저 시도했다가, 디스플레이를 구동하지 않으므로 DRM master 획득에 실패하고
+          Intel로 넘어가면서 남기는 메시지다.
+        </p>
+      </article>
+      <article class="cause benign">
+        <div class="log">xe 0000:00:02.0: Your graphics device a7a8 is not officially supported</div>
+        <p>
+          역시 정상이다. 신규 <code>xe</code> 드라이버가 이 iGPU를 <code>i915</code>에게
+          올바르게 양보하고 있다는 뜻이다.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <section>
+    <div class="head">
+      <p class="eyebrow">재발 시</p>
+      <h2>GUI가 다시 깨지면 이 순서로 확인</h2>
+    </div>
+    <p>
+      이번 건의 교훈은 <strong>증상이 가리키는 계층을 믿지 말 것</strong>이다.
+      입력 장치를 의심하기 전에 GPU가 바인딩되어 있는지부터 본다.
+    </p>
+    <ol class="checklist">
+      <li><span><span class="cmd">cat /proc/cmdline</span><span class="hint"><code>modeset=0</code>류 파라미터가 다시 들어와 있는지 확인한다.</span></span></li>
+      <li><span><span class="cmd">lspci -k | grep -A3 VGA</span><span class="hint"><code>Kernel driver in use</code> 줄이 두 GPU 모두에 있어야 한다. 없으면 여기서 원인이 끝난다.</span></span></li>
+      <li><span><span class="cmd">ls -l /dev/dri/</span><span class="hint"><code>simple-framebuffer</code>가 보이면 드라이버 미바인딩 상태다.</span></span></li>
+      <li><span><span class="cmd">ls /etc/X11/xorg.conf</span><span class="hint">되살아났는지 확인. 이 머신에서는 없는 편이 맞다.</span></span></li>
+      <li><span><span class="cmd">grep llvmpipe ~/.local/share/xorg/Xorg.0.log</span><span class="hint">걸리면 소프트웨어 렌더링으로 떨어진 것이다.</span></span></li>
+    </ol>
+
+    <div class="note">
+      <p class="eyebrow">권고</p>
+      <p>
+        NVIDIA 565.57.01은 2024년 10월 빌드로, 현재 커널(2026년 7월 빌드) 대비 상당히 오래됐다.
+        지금은 정상 동작하지만 다음 커널 업데이트 때 같은 DKMS 문제가 재발할 여지가 있으므로
+        최신 드라이버 브랜치로의 이전을 검토할 만하다.
+      </p>
+    </div>
+  </section>
+
+  <footer>
+    <span>rainnam-msi.local</span>
+    <span>진단 · 복구 2026-08-21 17:22–17:43 KST</span>
+    <span>상태: 해결</span>
+  </footer>
+
+</div>
